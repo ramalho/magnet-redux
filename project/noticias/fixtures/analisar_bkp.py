@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from __future__ import unicode_literals
+
 import zipfile
 import sys
 
@@ -74,10 +76,19 @@ def estruturar_noticia(nome, txt):
         if chave not in mapa_campos:
             continue # ignorar campos com valor constante
         valor = valor.strip()
-        if not valor:
+        if not valor or valor == 'bla':
             continue # cabecalho em branco
-        if valor.endswith(',') or valor.endswith('.'):
-            print nome, chave, valor
+        if chave == 'Effective_date':
+            pass
+        else:
+            if (valor.endswith(',')
+                or (valor.endswith('.')
+                    and not valor.endswith('...')
+                    and not valor.endswith('Inc.')
+                    and not valor.endswith('min.')
+                )
+            ):
+                valor = valor[:-1] # retirar , ou . final
         reg[chave] = valor
         stat = estatisticas.setdefault(chave, EstatisticasCampo(chave))
         stat.contabilizar(valor)
@@ -88,7 +99,7 @@ def estruturar_noticia(nome, txt):
 
 with zipfile.ZipFile(BKP_PATH) as bits_zip:
     for nome in bits_zip.namelist():
-        txt = bits_zip.read(nome).strip()
+        txt = bits_zip.read(nome).strip().decode('utf-8')
         if not txt: continue
         #print '*' * 80, nome
         #print txt
