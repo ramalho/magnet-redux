@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import zipfile
+import sys
 
 BKP_PATH = '../../../data/bits.zip'
 
@@ -15,8 +16,53 @@ Format: text/plain
 Language: pt
 '''
 
-# qt_campos_cabecalho = {}
-valores_campos_cabecalho = {}
+mapa_campos = {
+    'Description': 'resumo', # 3088
+    'Effective_date': 'dt_pub', # 7716
+    'Subject': 'assunto', #  687
+    'Title': 'titulo', #  7716
+}
+# 'Type', 'Format', 'Language', 'Publisher' tem sempre os mesmos valores:
+# Document, text/plain, pt, Magnet
+
+class EstatisticasCampo(object):
+    stats = ['tamanho_max', 'amostra_max', 'tamanho_min', 'amostra_min']
+    tamanho_max = 0
+    tamanho_min = sys.maxsize
+
+    def __init__(self, nome):
+        self.nome = nome
+
+    def contabilizar(self, valor):
+        valor = valor.strip()
+        if not valor: return  # não contar campos em branco
+        if len(valor) > self.tamanho_max:
+            self.tamanho_max = len(valor)
+            self.amostra_max = valor
+        elif len(valor) < self.tamanho_min:
+            self.tamanho_min = len(valor)
+            self.amostra_min = valor
+
+    def __repr__(self):
+        saida = []
+        for atr in self.stats:
+            valor = getattr(self, atr)
+            if isinstance(valor, basestring) and len(valor) > 70:
+                valor = valor[:67] + '...'
+            saida.append('{0:>12}: {1}'.format(atr, valor))
+        return '\n'.join(saida)
+
+
+mapa_campos = {
+    'Description': 'resumo', # 3088 ocorrencias
+    'Effective_date': 'dt_pub', # 7716 ocorrencias
+    'Subject': 'assunto', #  687 ocorrencias
+    'Title': 'titulo', #  7716 ocorrencias
+}
+# 'Type', 'Format', 'Language', 'Publisher' tem sempre os mesmos valores:
+# Document, text/plain, pt, Magnet
+
+estatisticas = {}
 
 def estruturar_noticia(nome, txt):
     reg = {}
@@ -25,14 +71,14 @@ def estruturar_noticia(nome, txt):
         if not lin:
             break # fim do cabecalho
         chave, valor = lin.split(':', 1)
+        if chave not in mapa_campos:
+            continue # ignorar campos com valor constante
         valor = valor.strip()
         if not valor:
             continue # cabecalho em branco
         reg[chave] = valor
-        # qt_campos_cabecalho[chave] = qt_campos_cabecalho.get(chave, 0) + 1
-        valores = valores_campos_cabecalho.setdefault(chave, set())
-        if len(valores) < 10:
-            valores.add(valor)
+        stat = estatisticas.setdefault(chave, EstatisticasCampo(chave))
+        stat.contabilizar(valor)
     assert reg, 'nenhum cabecalho encontrado em %r' % nome
     _, secao, ano_mes_id = nome.split('/', 2)
     reg.update(dict(secao=secao, id_orig=secao+'/'+ano_mes_id))
@@ -48,4 +94,4 @@ with zipfile.ZipFile(BKP_PATH) as bits_zip:
         #print reg
 
 import pprint
-pprint.pprint(valores_campos_cabecalho)
+pprint.pprint(estatisticas)
