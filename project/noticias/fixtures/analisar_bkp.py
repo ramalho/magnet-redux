@@ -15,7 +15,8 @@ Format: text/plain
 Language: pt
 '''
 
-qt_campos_cabecalho = {}
+# qt_campos_cabecalho = {}
+valores_campos_cabecalho = {}
 
 def estruturar_noticia(nome, txt):
     reg = {}
@@ -28,7 +29,10 @@ def estruturar_noticia(nome, txt):
         if not valor:
             continue # cabecalho em branco
         reg[chave] = valor
-        qt_campos_cabecalho[chave] = qt_campos_cabecalho.get(chave, 0) + 1
+        # qt_campos_cabecalho[chave] = qt_campos_cabecalho.get(chave, 0) + 1
+        valores = valores_campos_cabecalho.setdefault(chave, set())
+        if len(valores) < 10:
+            valores.add(valor)
     assert reg, 'nenhum cabecalho encontrado em %r' % nome
     _, secao, ano_mes_id = nome.split('/', 2)
     reg.update(dict(secao=secao, id_orig=secao+'/'+ano_mes_id))
@@ -44,4 +48,4 @@ with zipfile.ZipFile(BKP_PATH) as bits_zip:
         #print reg
 
 import pprint
-pprint.pprint(qt_campos_cabecalho)
+pprint.pprint(valores_campos_cabecalho)
