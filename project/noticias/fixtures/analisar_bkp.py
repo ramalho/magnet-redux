@@ -49,7 +49,7 @@ class EstatisticasCampo(object):
             valor = getattr(self, atr)
             if isinstance(valor, basestring) and len(valor) > 70:
                 valor = valor[:67] + '...'
-            saida.append('{0:>12}: {1}'.format(atr, valor))
+            saida.append('{0:>12}: {1!r}'.format(atr, valor))
         return '\n'.join(saida)
 
 
@@ -76,6 +76,8 @@ def estruturar_noticia(nome, txt):
         valor = valor.strip()
         if not valor:
             continue # cabecalho em branco
+        if valor.endswith(',') or valor.endswith('.'):
+            print nome, chave, valor
         reg[chave] = valor
         stat = estatisticas.setdefault(chave, EstatisticasCampo(chave))
         stat.contabilizar(valor)
