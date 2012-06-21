@@ -5,8 +5,11 @@ from __future__ import unicode_literals
 
 import zipfile
 import sys
+import datetime
+import pprint
+import json
 
-BKP_PATH = '../../../data/bits.zip'
+BKP_PATH = '../../../data/'
 
 '''
 Title: Super Mario Sunshine chega detonando para GameCube
@@ -36,7 +39,6 @@ class EstatisticasCampo(object):
         self.nome = nome
 
     def contabilizar(self, valor):
-        valor = valor.strip()
         if not valor: return  # não contar campos em branco
         if len(valor) > self.tamanho_max:
             self.tamanho_max = len(valor)
@@ -68,7 +70,8 @@ estatisticas = {}
 
 def estruturar_noticia(nome, txt):
     reg = {}
-    for lin in txt.split('\n'):
+    linhas = txt.split('\n')
+    for num_lin, lin in enumerate(linhas):
         lin = lin.strip()
         if not lin:
             break # fim do cabecalho
@@ -79,7 +82,11 @@ def estruturar_noticia(nome, txt):
         if not valor or valor == 'bla':
             continue # cabecalho em branco
         if chave == 'Effective_date':
-            pass
+            if len(valor) == 10:
+                valor += ' 00:00:00'
+            # converter e desconverter para validar
+            valor = datetime.datetime.strptime(valor, '%Y-%m-%d %H:%M:%S')
+            valor = valor.strftime('%Y-%m-%d %H:%M:%S')
         else:
             if (valor.endswith(',')
                 or (valor.endswith('.')
@@ -89,22 +96,27 @@ def estruturar_noticia(nome, txt):
                 )
             ):
                 valor = valor[:-1] # retirar , ou . final
-        reg[chave] = valor
-        stat = estatisticas.setdefault(chave, EstatisticasCampo(chave))
-        stat.contabilizar(valor)
+            stat = estatisticas.setdefault(chave, EstatisticasCampo(chave))
+            stat.contabilizar(valor)
+        reg[mapa_campos[chave]] = valor
     assert reg, 'nenhum cabecalho encontrado em %r' % nome
     _, secao, ano_mes_id = nome.split('/', 2)
     reg.update(dict(secao=secao, id_orig=secao+'/'+ano_mes_id))
+    reg['corpo'] = '\n'.join(linhas[num_lin:]).strip()
     return reg
 
-with zipfile.ZipFile(BKP_PATH) as bits_zip:
+bits = []
+with zipfile.ZipFile(BKP_PATH+'bits.zip') as bits_zip:
     for nome in bits_zip.namelist():
         txt = bits_zip.read(nome).strip().decode('utf-8')
         if not txt: continue
         #print '*' * 80, nome
         #print txt
         reg = estruturar_noticia(nome, txt)
-        #print reg
+        #pprint.pprint(reg)
+        bits.append(reg)
 
-import pprint
+with open(BKP_PATH+'bits.json', 'wb') as bits_json:
+    json.dump(bits, bits_json, indent=2)
+
 pprint.pprint(estatisticas)
