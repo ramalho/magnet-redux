@@ -5,9 +5,9 @@ import datetime
 from django.db import models
 
 NIVEIS_DESTAQUE = [
-        (-1, u'sem destaque'),
-        (1, u'primário'),
-        (2, u'secundário'),
+        (-1, u'-'),
+        (1, u'1'),
+        (2, u'2'),
     ]
 
 SECOES = 'cosmonet especiais games internet mac mercado produtos'.split()
@@ -37,4 +37,13 @@ class Noticia(models.Model):
 
     def __unicode__(self):
         return self.titulo
+
+    def lead(self):
+        if self.resumo.strip():
+            return resumo
+        else:
+            if u'\r\n' in self.corpo: # tirar quebras de linhas do Windows
+                self.corpo = self.corpo.replace(u'\r\n', u'\n')
+                self.save()
+            return self.corpo.split(u'\n\n')[0]
 
