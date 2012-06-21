@@ -40,7 +40,7 @@ class Noticia(models.Model):
 
     def lead(self):
         if self.resumo.strip():
-            return resumo
+            return self.resumo
         else:
             if u'\r\n' in self.corpo: # tirar quebras de linhas do Windows
                 self.corpo = self.corpo.replace(u'\r\n', u'\n')

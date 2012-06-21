@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from django.core.management.base import BaseCommand, CommandError
 from noticiario.models import Noticia
 
@@ -48,5 +50,17 @@ Abrindo ../data/bits.json
 real    21m17.169s
 user    0m14.561s
 sys 0m9.565s
+
+Depois este script foi testado em um MacBook Pro (2011) com "Intel Core i7
+Dual @ 2.7 GHz e o resultado foi:
+
+7600 noticias salvas
+7700 noticias salvas
+7716 noticias salvas
+
+real    1m52.988s
+user    0m8.956s
+sys 0m6.691s
+
 
 '''

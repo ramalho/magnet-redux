@@ -23,7 +23,7 @@ class HomePageView(TemplateView):
             destaque = destaques.latest()
         except Noticia.DoesNotExist:
             destaque = {'titulo':u'Nenhum destaque primário encontrado',
-                        'resumo':u'Use o admin para designar uma notícia'
+                        'lead':u'Use o admin para designar uma notícia'
                                  u' como destaque primário. O destaque'
                                  u' primário mais recente aparece aqui',
                         'pk': 0}
