@@ -52,7 +52,7 @@ user    0m14.561s
 sys 0m9.565s
 
 Depois este script foi testado em um MacBook Pro (2011) com "Intel Core i7
-Dual @ 2.7 GHz e o resultado foi:
+Dual @ 2.7 GHz" e o resultado foi:
 
 7600 noticias salvas
 7700 noticias salvas

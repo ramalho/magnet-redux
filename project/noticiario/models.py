@@ -52,7 +52,8 @@ class Noticia(models.Model):
         from django.db import connection
         cursor = connection.cursor()
 
-        secoes = (t[0] for t in cursor.execute("SELECT DISTINCT secao FROM noticiario_noticia"))
+        secoes = cursor.execute("SELECT DISTINCT secao FROM noticiario_noticia")
+        secoes = (t[0] for t in secoes)
 
         return secoes
 

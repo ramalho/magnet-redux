@@ -102,7 +102,7 @@
             {% for noticia in linha %}
             <div class="span4">
               <h2>{{noticia.titulo}}</h2>
-              <p>{{noticia.lead}} </p>
+              <p>{{noticia.lead}}</p>
               <p><a class="btn" href="{% url noticia-detail pk=noticia.pk %}">Ver &raquo;</a></p>
             </div><!--/span noticia-->
             {% endfor %}

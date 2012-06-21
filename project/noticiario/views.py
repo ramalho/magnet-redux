@@ -32,6 +32,6 @@ class HomePageView(TemplateView):
         if secao:
             resultado = resultado.filter(secao=secao)
         resultado = resultado.order_by('dt_criacao')[:12]
-        context['destaques_secundarios'] = ((resultado[i:i+3]) for i in range(0, len(resultado), 3))
+        context['destaques_secundarios'] = (resultado[i:i+3] for i in range(0, len(resultado), 3))
         context['secoes'] = menu_secoes(secao)
         return context
