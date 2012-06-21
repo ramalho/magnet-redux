@@ -7,5 +7,6 @@ from .models import Noticia
 
 urlpatterns = patterns('',
     url(r'^$', HomePageView.as_view(), name='home'),
-    url(r'bits/(?P<pk>\d+)/', DetailView.as_view(model=Noticia), name='noticia-detail')
+    url(r'^(?P<secao>\w+)/', HomePageView.as_view(), name='home-secao'),
+    url(r'^bits/(?P<pk>\d+)/', DetailView.as_view(model=Noticia), name='noticia-detail')
 )

@@ -15,7 +15,7 @@ SECOES_CHOICES = zip(SECOES, SECOES)
 
 class Noticia(models.Model):
     titulo = models.CharField(u'título', max_length=256)
-    secao = models.CharField(u'seção', max_length=32, choices=SECOES_CHOICES, db_index=True)
+    secao = models.CharField(u'canal', max_length=32, choices=SECOES_CHOICES, db_index=True)
     assunto = models.CharField(max_length=256, blank=True)
     resumo = models.CharField(max_length=256, blank=True)
     corpo = models.TextField()
@@ -46,4 +46,13 @@ class Noticia(models.Model):
                 self.corpo = self.corpo.replace(u'\r\n', u'\n')
                 self.save()
             return self.corpo.split(u'\n\n')[0]
+
+    @classmethod
+    def secoes_existentes(cls):
+        from django.db import connection
+        cursor = connection.cursor()
+
+        secoes = (t[0] for t in cursor.execute("SELECT DISTINCT secao FROM noticiario_noticia"))
+
+        return secoes
 
